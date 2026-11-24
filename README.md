@@ -32,5 +32,6 @@ pytest
 
 ```
 alula/          Simulator source code
+aircraft/       Aircraft data files (geometry, mass, stability derivatives)
 tests/          Unit tests, one file per module
 ```

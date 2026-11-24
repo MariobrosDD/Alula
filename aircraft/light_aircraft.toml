@@ -1,0 +1,58 @@
+name = "Light aircraft"
+
+[sign_conventions]
+elevator = "positive deflection is trailing edge down and pitches the nose down"
+aileron = "positive deflection rolls the aircraft right wing down"
+rudder = "positive deflection is trailing edge left and yaws the nose left"
+throttle = "0 is idle and 1 is full power"
+
+[geometry]
+wing_area_m2 = 16.2
+wingspan_m = 11.0
+mean_chord_m = 1.49
+
+[mass]
+mass_kg = 1000.0
+ixx_kg_m2 = 1285.0
+iyy_kg_m2 = 1825.0
+izz_kg_m2 = 2667.0
+ixz_kg_m2 = 0.0
+
+[aerodynamics.validity]
+alpha_min_deg = -8.0
+alpha_max_deg = 13.0
+beta_max_deg = 20.0
+
+[aerodynamics.lift]
+cl_0 = 0.25
+cl_alpha = 4.96
+cl_q = 3.9
+cl_elevator = 0.43
+
+[aerodynamics.drag]
+cd_0 = 0.027
+oswald_efficiency = 0.8
+
+[aerodynamics.side_force]
+cy_beta = -0.31
+cy_rudder = 0.187
+
+[aerodynamics.rolling_moment]
+c_roll_beta = -0.089
+c_roll_p = -0.47
+c_roll_r = 0.10
+c_roll_aileron = 0.18
+c_roll_rudder = 0.0147
+
+[aerodynamics.pitching_moment]
+cm_0 = -0.05
+cm_alpha = -0.74
+cm_q = -12.4
+cm_elevator = -1.28
+
+[aerodynamics.yawing_moment]
+cn_beta = 0.065
+cn_p = -0.03
+cn_r = -0.099
+cn_aileron = -0.05
+cn_rudder = -0.066

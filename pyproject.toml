@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alula"
+version = "0.1.0"
+description = "A six-degree-of-freedom flight dynamics simulator, built from first principles."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["alula"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -72,11 +72,19 @@ class AerodynamicCoefficients:
 
 
 @dataclass(frozen=True)
+class PropulsionData:
+    max_shaft_power: float
+    propeller_efficiency: float
+    static_thrust: float
+
+
+@dataclass(frozen=True)
 class Aircraft:
     name: str
     geometry: Geometry
     mass_properties: MassProperties
     aerodynamics: AerodynamicCoefficients
+    propulsion: PropulsionData
     sign_conventions: dict[str, str]
 
 
@@ -93,6 +101,7 @@ def load_aircraft(path: str | Path) -> Aircraft:
         geometry=_read_geometry(_table(data, "geometry")),
         mass_properties=_read_mass_properties(_table(data, "mass")),
         aerodynamics=_read_aerodynamics(_table(data, "aerodynamics")),
+        propulsion=_read_propulsion(_table(data, "propulsion")),
         sign_conventions=_read_sign_conventions(_table(data, "sign_conventions")),
     )
 
@@ -139,6 +148,17 @@ def _read_aerodynamics(table: dict[str, Any]) -> AerodynamicCoefficients:
 
     return AerodynamicCoefficients(
         alpha_min=alpha_min, alpha_max=alpha_max, beta_max=beta_max, **coefficients
+    )
+
+
+def _read_propulsion(table: dict[str, Any]) -> PropulsionData:
+    propeller_efficiency = _positive_number(table, "propeller_efficiency", "propulsion")
+    if propeller_efficiency > 1.0:
+        raise ValueError("propeller_efficiency must be in the interval (0, 1]")
+    return PropulsionData(
+        max_shaft_power=1000.0 * _positive_number(table, "max_shaft_power_kw", "propulsion"),
+        propeller_efficiency=propeller_efficiency,
+        static_thrust=_positive_number(table, "static_thrust_n", "propulsion"),
     )
 
 

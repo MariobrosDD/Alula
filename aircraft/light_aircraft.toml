@@ -18,6 +18,11 @@ iyy_kg_m2 = 1825.0
 izz_kg_m2 = 2667.0
 ixz_kg_m2 = 0.0
 
+[propulsion]
+max_shaft_power_kw = 100.0
+propeller_efficiency = 0.7
+static_thrust_n = 2500.0
+
 [aerodynamics.validity]
 alpha_min_deg = -8.0
 alpha_max_deg = 13.0

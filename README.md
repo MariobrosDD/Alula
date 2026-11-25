@@ -12,7 +12,7 @@ Every module is backed by tests and validated against published reference data.
 ## Roadmap
 
 - [x] **Foundations**: International Standard Atmosphere, rotations (Euler angles, quaternions)
-- [ ] **First flight**: linear aerodynamic model, propulsion, 6-DOF equations of motion, RK4 integrator
+- [x] **First flight**: linear aerodynamic model, propulsion, 6-DOF equations of motion, RK4 integrator
 - [ ] **Equilibrium and analysis**: trim, linearisation, dynamic modes
 - [ ] **Control**: PID controllers and an altitude/heading autopilot
 - [ ] **Visualisation**: time-history plots and a 3D view of the flight
@@ -28,10 +28,20 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## First flight
+
+```bash
+python examples/first_flight.py
+```
+
+Trims the light aircraft at 1000 m, pulls the stick back for one second and prints how the aircraft climbs,
+descends and slowly settles again: the phugoid mode, with a period of about 32 seconds.
+
 ## Project layout
 
 ```
 alula/          Simulator source code
 aircraft/       Aircraft data files (geometry, mass, stability derivatives)
+examples/       Runnable scripts that show the simulator in action
 tests/          Unit tests, one file per module
 ```

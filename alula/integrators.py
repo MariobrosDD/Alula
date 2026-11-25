@@ -43,30 +43,32 @@ def integrate(
     post_step: PostStep | None = None,
     initial_time: float = 0.0,
 ) -> Trajectory:
-    step_count = _step_count(time_step, duration)
+    steps = step_count(time_step, duration)
     state = np.array(initial_state, dtype=float)
-    states = np.empty((step_count + 1, state.size))
+    states = np.empty((steps + 1, state.size))
     states[0] = state
 
-    for index in range(1, step_count + 1):
+    for index in range(1, steps + 1):
         time = initial_time + (index - 1) * time_step
         state = step(derivative, time, state, time_step)
         if post_step is not None:
             state = post_step(state)
         states[index] = state
 
-    times = initial_time + time_step * np.arange(step_count + 1)
+    times = initial_time + time_step * np.arange(steps + 1)
     return Trajectory(times, states)
 
 
-def _step_count(time_step: float, duration: float) -> int:
+def step_count(time_step: float, duration: float) -> int:
     if time_step <= 0.0:
         raise ValueError(f"Time step must be positive, got {time_step} s")
     if duration < 0.0:
         raise ValueError(f"Duration cannot be negative, got {duration} s")
-    step_count = round(duration / time_step)
-    if not math.isclose(step_count * time_step, duration, rel_tol=STEP_COUNT_TOLERANCE, abs_tol=STEP_COUNT_TOLERANCE):
+    steps = round(duration / time_step)
+    if not math.isclose(
+        steps * time_step, duration, rel_tol=STEP_COUNT_TOLERANCE, abs_tol=STEP_COUNT_TOLERANCE
+    ):
         raise ValueError(
             f"Duration {duration} s is not a whole number of time steps of {time_step} s"
         )
-    return step_count
+    return steps

@@ -52,6 +52,13 @@ def test_reads_stability_derivatives(light_aircraft):
     assert aerodynamics.c_roll_p == -0.47
 
 
+def test_reads_propulsion_in_si_units(light_aircraft):
+    propulsion = light_aircraft.propulsion
+    assert propulsion.max_shaft_power == 100_000.0
+    assert propulsion.propeller_efficiency == 0.7
+    assert propulsion.static_thrust == 2500.0
+
+
 def test_states_every_control_sign_convention(light_aircraft):
     assert set(light_aircraft.sign_conventions) == {"elevator", "aileron", "rudder", "throttle"}
 
@@ -66,6 +73,9 @@ def test_states_every_control_sign_convention(light_aircraft):
         ("oswald_efficiency = 0.8", "oswald_efficiency = 1.2", "oswald_efficiency"),
         ('rudder = "positive', 'unused = "positive', "rudder"),
         ("[geometry]", "[geometry_typo]", "geometry"),
+        ("[propulsion]", "[propulsion_typo]", "propulsion"),
+        ("propeller_efficiency = 0.7", "propeller_efficiency = 1.5", "propeller_efficiency"),
+        ("static_thrust_n = 2500.0", "static_thrust_n = 0.0", "static_thrust_n"),
     ],
 )
 def test_rejects_invalid_files_with_clear_message(

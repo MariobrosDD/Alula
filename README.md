@@ -11,7 +11,7 @@ Every module is backed by tests and validated against published reference data.
 
 ## Roadmap
 
-- [ ] **Foundations**: International Standard Atmosphere, rotations (Euler angles, quaternions)
+- [x] **Foundations**: International Standard Atmosphere, rotations (Euler angles, quaternions)
 - [ ] **First flight**: linear aerodynamic model, propulsion, 6-DOF equations of motion, RK4 integrator
 - [ ] **Equilibrium and analysis**: trim, linearisation, dynamic modes
 - [ ] **Control**: PID controllers and an altitude/heading autopilot

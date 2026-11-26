@@ -14,7 +14,7 @@ Every module is backed by tests and validated against published reference data.
 - [x] **Foundations**: International Standard Atmosphere, rotations (Euler angles, quaternions)
 - [x] **First flight**: linear aerodynamic model, propulsion, 6-DOF equations of motion, RK4 integrator
 - [x] **Equilibrium and analysis**: trim, linearisation, dynamic modes
-- [ ] **Control**: PID controllers and an altitude/heading autopilot
+- [x] **Control**: PID controllers and an altitude/heading autopilot
 - [ ] **Visualisation**: time-history plots and a 3D view of the flight
 
 ## Getting started
@@ -46,6 +46,15 @@ python examples/aircraft_modes.py
 Linearises the trimmed aircraft and computes its five classic dynamic modes (short period, phugoid,
 roll subsidence, Dutch roll and spiral) from the eigenvalues of the state matrix. The phugoid period obtained
 this way agrees with the one measured in the nonlinear simulation to within 2 %.
+
+## Autopilot
+
+```bash
+python examples/autopilot_flight.py
+```
+
+Engages a cascaded PID autopilot (altitude, heading, airspeed and turn coordination) and asks it to climb to
+1200 m, turn to heading 120 and slow down to 50 m/s, all at the same time.
 
 ## Project layout
 

@@ -1,12 +1,12 @@
+import re
 from pathlib import Path
 
 import pytest
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence
-from PySide6.QtWidgets import QFileDialog, QMessageBox
+from PySide6.QtWidgets import QFileDialog, QLabel, QMessageBox
 
-from alula.gui.aircraft_summary import aircraft_summary
-from alula.gui.aircraft_tab import NO_AIRCRAFT_TEXT
+from alula.gui.aircraft_page import NO_AIRCRAFT_TEXT
+from alula.gui.aircraft_summary import aircraft_summary, key_figures
 from alula.gui.main_window import MainWindow
 
 
@@ -39,56 +39,96 @@ def captured_errors(monkeypatch):
     return messages
 
 
-def cell(window, section, row, column):
-    return window.aircraft_tab.tables[section].item(row, column).text()
-
-
 def test_starts_with_the_default_aircraft_loaded(window, light_aircraft):
     assert window.aircraft == light_aircraft
     assert window.windowTitle() == "Alula - Light aircraft"
-    assert window.aircraft_tab.title.text() == "Light aircraft"
+    assert window.aircraft_page.title.text() == "Light aircraft"
 
 
 def test_starts_empty_without_an_aircraft_file(empty_window):
     assert empty_window.aircraft is None
     assert empty_window.windowTitle() == "Alula"
-    assert empty_window.aircraft_tab.title.text() == NO_AIRCRAFT_TEXT
-    assert empty_window.aircraft_tab.tables == {}
+    assert empty_window.aircraft_page.title.text() == NO_AIRCRAFT_TEXT
+    assert empty_window.aircraft_page.cards == {}
+    assert empty_window.aircraft_page.stat_tiles == []
 
 
-def test_aircraft_tab_shows_one_table_per_summary_section(window, light_aircraft):
+def test_sidebar_starts_on_the_aircraft_page(window):
+    assert list(window.navigation_buttons) == ["Aircraft"]
+    assert window.current_page_name() == "Aircraft"
+    assert window.pages.currentWidget() is window.aircraft_page
+
+
+def test_stat_tiles_show_the_key_figures(window, light_aircraft):
+    shown = [(tile.value.text(), tile.unit.text(), tile.label.text()) for tile in window.aircraft_page.stat_tiles]
+    expected = [(figure.value, figure.unit, figure.label.upper()) for figure in key_figures(light_aircraft)]
+    assert shown == expected
+
+
+def test_only_the_first_key_figure_has_no_divider(window):
+    assert [tile.property("first") for tile in window.aircraft_page.stat_tiles] == [True, False, False, False, False]
+
+
+def test_window_and_sidebar_show_the_logo(window):
+    assert not window.windowIcon().isNull()
+    assert not window.logo.pixmap().isNull()
+
+
+def test_sidebar_entries_are_numbered(window):
+    assert window.navigation_buttons["Aircraft"].text().split() == ["01", "Aircraft"]
+
+
+def test_style_sheet_has_no_rounded_corners_or_colour(window):
+    style = window.styleSheet()
+    radii = re.findall(r"border-radius:\s*(\d+)px", style)
+    assert radii and set(radii) == {"0"}
+    for colour in re.findall(r"#([0-9a-fA-F]{6})\b", style):
+        red, green, blue = (int(colour[i : i + 2], 16) for i in (0, 2, 4))
+        assert red == green == blue, f"#{colour} is not a shade of grey"
+
+
+def test_one_card_per_summary_section_with_its_rows(window, light_aircraft):
     sections = aircraft_summary(light_aircraft)
-    assert list(window.aircraft_tab.tables) == [section.title for section in sections]
+    assert list(window.aircraft_page.cards) == [section.title for section in sections]
     for section in sections:
-        assert window.aircraft_tab.tables[section.title].rowCount() == len(section.rows)
+        expected = [(row.quantity, row.value, row.unit) for row in section.rows]
+        assert window.aircraft_page.cards[section.title].rows() == expected
 
 
-def test_aircraft_tab_shows_values_with_units(window):
-    assert (cell(window, "Geometry", 0, 0), cell(window, "Geometry", 0, 1), cell(window, "Geometry", 0, 2)) == (
-        "Wing area",
-        "16.2",
-        "m²",
-    )
+def test_number_cards_show_units_and_text_cards_do_not(window):
+    geometry_units = window.aircraft_page.cards["Geometry"].findChildren(QLabel, "RowUnit")
+    assert [label.text() for label in geometry_units] == ["m²", "m", "m", "-"]
+    sign_card = window.aircraft_page.cards["Control sign conventions"]
+    assert sign_card.findChildren(QLabel, "RowUnit") == []
+    descriptions = sign_card.findChildren(QLabel, "RowText")
+    assert len(descriptions) == 4
+    assert all(label.wordWrap() for label in descriptions)
 
 
-def test_numbers_are_right_aligned_and_text_sections_hide_the_unit_column(window):
-    numbers = window.aircraft_tab.tables["Geometry"]
-    assert numbers.item(0, 1).textAlignment() & Qt.AlignmentFlag.AlignRight
-    assert not numbers.isColumnHidden(2)
-    text = window.aircraft_tab.tables["Control sign conventions"]
-    assert not text.item(0, 1).textAlignment() & Qt.AlignmentFlag.AlignRight
-    assert text.isColumnHidden(2)
+def test_top_view_draws_the_loaded_wing(window, light_aircraft):
+    planform = window.aircraft_page.planform
+    assert planform.geometry_data == light_aircraft.geometry
+    planform.resize(600, 320)
+    assert not planform.grab().isNull()
 
 
-def test_tables_are_read_only(window):
-    table = window.aircraft_tab.tables["Geometry"]
-    assert table.editTriggers() == table.EditTrigger.NoEditTriggers
+def test_open_button_opens_the_file_dialog(window, monkeypatch):
+    opened = []
+    monkeypatch.setattr(QFileDialog, "getOpenFileName", lambda *args: opened.append(True) or ("", ""))
+    window.aircraft_page.open_button.click()
+    assert opened == [True]
 
 
 def test_loading_emits_the_aircraft_loaded_signal(qtbot, empty_window, light_aircraft_file):
     with qtbot.waitSignal(empty_window.aircraft_loaded, timeout=1000) as blocker:
         assert empty_window.load_aircraft(light_aircraft_file)
     assert blocker.args[0].name == "Light aircraft"
+
+
+def test_reloading_replaces_cards_instead_of_duplicating_them(window, light_aircraft_file):
+    window.load_aircraft(light_aircraft_file)
+    assert len(window.aircraft_page.cards) == len(aircraft_summary(window.aircraft))
+    assert len(window.aircraft_page.stat_tiles) == 5
 
 
 def test_status_bar_shows_the_loaded_file(window, light_aircraft_file):

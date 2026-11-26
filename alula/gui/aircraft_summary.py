@@ -70,8 +70,26 @@ class SummarySection:
     rows: tuple[SummaryRow, ...]
 
 
+@dataclass(frozen=True)
+class KeyFigure:
+    label: str
+    value: str
+    unit: str
+
+
 def format_value(value: float) -> str:
     return f"{value:.4g}"
+
+
+def key_figures(aircraft: Aircraft) -> list[KeyFigure]:
+    geometry = aircraft.geometry
+    return [
+        KeyFigure("Mass", format_value(aircraft.mass_properties.mass), "kg"),
+        KeyFigure("Wingspan", format_value(geometry.wingspan), "m"),
+        KeyFigure("Wing area", format_value(geometry.wing_area), "m²"),
+        KeyFigure("Aspect ratio", f"{geometry.aspect_ratio:.2f}", ""),
+        KeyFigure("Engine power", format_value(aircraft.propulsion.max_shaft_power / 1000.0), "kW"),
+    ]
 
 
 def aircraft_summary(aircraft: Aircraft) -> list[SummarySection]:

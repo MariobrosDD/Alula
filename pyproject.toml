@@ -21,6 +21,9 @@ alula-gui = "alula.gui.app:main"
 [tool.setuptools]
 packages = ["alula", "alula.gui"]
 
+[tool.setuptools.package-data]
+"alula.gui" = ["assets/*.png", "assets/*.ico"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 qt_api = "pyside6"

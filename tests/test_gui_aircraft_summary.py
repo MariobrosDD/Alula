@@ -7,6 +7,7 @@ from alula.gui.aircraft_summary import (
     AERODYNAMIC_SECTIONS,
     aircraft_summary,
     format_value,
+    key_figures,
 )
 
 VALIDITY_FIELDS = {"alpha_min", "alpha_max", "beta_max"}
@@ -85,3 +86,14 @@ def test_every_aerodynamic_coefficient_is_listed_exactly_once():
 def test_sign_conventions_are_listed_for_every_control(summary):
     controls = [entry.quantity for entry in section(summary, "Control sign conventions").rows]
     assert controls == ["Elevator", "Aileron", "Rudder", "Throttle"]
+
+
+def test_key_figures_summarise_the_aircraft_at_a_glance(light_aircraft):
+    figures = [(figure.label, figure.value, figure.unit) for figure in key_figures(light_aircraft)]
+    assert figures == [
+        ("Mass", "1000", "kg"),
+        ("Wingspan", "11", "m"),
+        ("Wing area", "16.2", "m²"),
+        ("Aspect ratio", "7.47", ""),
+        ("Engine power", "100", "kW"),
+    ]

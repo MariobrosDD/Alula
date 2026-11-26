@@ -40,7 +40,7 @@ class AutopilotGains:
     pitch_to_elevator: LoopGains = field(default_factory=lambda: LoopGains(2.0, 0.5, 0.5))
     heading_to_bank: LoopGains = field(default_factory=lambda: LoopGains(1.0))
     bank_to_aileron: LoopGains = field(default_factory=lambda: LoopGains(2.0, 0.0, 0.3))
-    sideslip_to_rudder: LoopGains = field(default_factory=lambda: LoopGains(10.0, 4.0))
+    sideslip_to_rudder: LoopGains = field(default_factory=lambda: LoopGains(8.0, 4.0, 1.5))
     airspeed_to_throttle: LoopGains = field(default_factory=lambda: LoopGains(0.1, 0.02))
     max_pitch_offset: float = math.radians(6.0)
     max_bank: float = math.radians(25.0)

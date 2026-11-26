@@ -56,6 +56,16 @@ python examples/autopilot_flight.py
 Engages a cascaded PID autopilot (altitude, heading, airspeed and turn coordination) and asks it to climb to
 1200 m, turn to heading 120 and slow down to 50 m/s, all at the same time.
 
+## Plots
+
+Every example accepts `--plot` to open the results in a window: stacked time histories of the flight,
+the ground track seen from above, or the eigenvalues of the dynamic modes. Plotting needs Matplotlib:
+
+```bash
+pip install -e ".[plots]"
+python examples/autopilot_flight.py --plot
+```
+
 ## Project layout
 
 ```

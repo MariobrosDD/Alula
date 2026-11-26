@@ -1,3 +1,4 @@
+import argparse
 import math
 from pathlib import Path
 
@@ -22,6 +23,10 @@ def describe(name: str, mode) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Dynamic modes of the trimmed aircraft.")
+    parser.add_argument("--plot", action="store_true", help="show the eigenvalues in a window")
+    arguments = parser.parse_args()
+
     aircraft = load_aircraft(AIRCRAFT_FILE)
     trimmed = trim(aircraft, ALTITUDE, AIRSPEED)
     modes = aircraft_modes(linearize(aircraft, trimmed))
@@ -37,6 +42,14 @@ def main() -> None:
 
     lanchester = math.sqrt(2.0) * math.pi * AIRSPEED / STANDARD_GRAVITY
     print(f"\nLanchester's phugoid estimate: {lanchester:.1f} s")
+
+    if arguments.plot:
+        import matplotlib.pyplot as plt
+
+        from alula.plotting import plot_modes
+
+        plot_modes(modes)
+        plt.show()
 
 
 if __name__ == "__main__":

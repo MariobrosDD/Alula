@@ -4,6 +4,7 @@ import pytest
 from alula.rotations import (
     body_to_ned_from_euler,
     body_to_ned_from_quaternion,
+    euler_angle_rates,
     euler_from_body_to_ned,
     euler_from_quaternion,
     normalize_quaternion,
@@ -127,3 +128,29 @@ def test_constant_yaw_rate_turns_heading_linearly():
     assert attitude.yaw == pytest.approx(yaw_rate * duration, abs=1e-6)
     assert attitude.roll == pytest.approx(0.0, abs=1e-12)
     assert attitude.pitch == pytest.approx(0.0, abs=1e-12)
+
+def test_euler_rates_equal_body_rates_in_level_flight():
+    assert euler_angle_rates(0.0, 0.0, [0.1, 0.2, 0.3]) == pytest.approx([0.1, 0.2, 0.3])
+
+
+def test_yaw_rate_with_nose_up_also_rolls_the_euler_frame():
+    pitch = np.radians(30)
+    rates = euler_angle_rates(roll=0.0, pitch=pitch, angular_velocity=[0.0, 0.0, 0.2])
+    assert rates == pytest.approx([0.2 * np.tan(pitch), 0.0, 0.2 / np.cos(pitch)])
+
+
+@pytest.mark.parametrize("roll, pitch, yaw", GENERIC_ATTITUDES)
+def test_euler_rates_agree_with_quaternion_kinematics(roll, pitch, yaw):
+    angular_velocity = np.array([0.4, -0.3, 0.2])
+    time_step = 1e-7
+    quaternion = quaternion_from_euler(roll, pitch, yaw)
+    advanced = quaternion + time_step * quaternion_derivative(quaternion, angular_velocity)
+    later = euler_from_quaternion(advanced)
+    numerical = (np.array(later) - np.array([roll, pitch, yaw])) / time_step
+    assert numerical == pytest.approx(euler_angle_rates(roll, pitch, angular_velocity), abs=1e-5)
+
+
+@pytest.mark.parametrize("pitch", [np.pi / 2, -np.pi / 2])
+def test_euler_rates_are_undefined_at_gimbal_lock(pitch):
+    with pytest.raises(ValueError, match="gimbal lock"):
+        euler_angle_rates(0.0, pitch, [0.0, 0.0, 0.1])

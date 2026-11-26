@@ -62,10 +62,14 @@ def test_initial_state_describes_requested_flight_condition():
     assert state.angular_velocity_body == pytest.approx(np.zeros(3))
 
 
-@pytest.mark.parametrize("altitude, airspeed", [(0.0, 50.0), (-10.0, 50.0), (1000.0, 0.0)])
+@pytest.mark.parametrize("altitude, airspeed", [(-10.0, 50.0), (1000.0, 0.0), (1000.0, -5.0)])
 def test_initial_state_rejects_impossible_conditions(altitude, airspeed):
     with pytest.raises(ValueError):
         initial_state(altitude, airspeed, 0.0)
+
+
+def test_initial_state_accepts_sea_level():
+    assert initial_state(0.0, 50.0, 0.0).altitude == 0.0
 
 
 def test_trimmed_aircraft_keeps_flying_straight_and_level(cruise):

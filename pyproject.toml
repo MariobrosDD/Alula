@@ -12,10 +12,15 @@ dependencies = ["numpy>=2.0"]
 
 [project.optional-dependencies]
 plots = ["matplotlib>=3.9"]
-dev = ["pytest>=8", "matplotlib>=3.9"]
+gui = ["matplotlib>=3.9", "PySide6>=6.7"]
+dev = ["pytest>=8", "pytest-qt>=4.4", "matplotlib>=3.9", "PySide6>=6.7"]
+
+[project.gui-scripts]
+alula-gui = "alula.gui.app:main"
 
 [tool.setuptools]
-packages = ["alula"]
+packages = ["alula", "alula.gui"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+qt_api = "pyside6"

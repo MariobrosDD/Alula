@@ -37,6 +37,15 @@ def test_product_of_inertia_enters_with_negative_sign(tmp_path, light_aircraft_f
     assert inertia[0, 2] == inertia[2, 0] == -50.0
 
 
+def test_aircraft_loaded_twice_from_the_same_file_are_equal(light_aircraft_file):
+    assert load_aircraft(light_aircraft_file) == load_aircraft(light_aircraft_file)
+
+
+def test_aircraft_with_different_inertia_are_not_equal(tmp_path, light_aircraft_file):
+    variant = write_variant(tmp_path, light_aircraft_file, "iyy_kg_m2 = 1825.0", "iyy_kg_m2 = 1900.0")
+    assert load_aircraft(variant) != load_aircraft(light_aircraft_file)
+
+
 def test_converts_validity_limits_to_radians(light_aircraft):
     aerodynamics = light_aircraft.aerodynamics
     assert aerodynamics.alpha_min == pytest.approx(math.radians(-8.0))

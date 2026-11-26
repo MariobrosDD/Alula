@@ -41,6 +41,11 @@ class MassProperties:
     mass: float
     inertia: NDArray[np.float64]
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, MassProperties):
+            return NotImplemented
+        return self.mass == other.mass and np.array_equal(self.inertia, other.inertia)
+
 
 @dataclass(frozen=True)
 class AerodynamicCoefficients:

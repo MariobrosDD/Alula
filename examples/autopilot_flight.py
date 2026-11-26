@@ -27,6 +27,8 @@ def compass_heading(yaw: float) -> float:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Autopilot climb, turn and speed change.")
     parser.add_argument("--plot", action="store_true", help="show time histories and ground track")
+    parser.add_argument("--3d", dest="view_3d", action="store_true", help="show the flight in 3D and animate it")
+    parser.add_argument("--gif", metavar="PATH", help="save the 3D animation as an animated GIF")
     arguments = parser.parse_args()
 
     aircraft = load_aircraft(AIRCRAFT_FILE)
@@ -61,13 +63,26 @@ def main() -> None:
 
     print(f"\nSimulation ended at t = {result.final_time:.1f} s: {result.termination.value}")
 
+    if not (arguments.plot or arguments.view_3d or arguments.gif):
+        return
+
+    import matplotlib.pyplot as plt
+
+    from alula.plotting import plot_flight, plot_ground_track
+    from alula.view3d import animate_flight, plot_flight_3d
+
     if arguments.plot:
-        import matplotlib.pyplot as plt
-
-        from alula.plotting import plot_flight, plot_ground_track
-
         plot_flight(result)
         plot_ground_track(history)
+    animation = None
+    if arguments.view_3d or arguments.gif:
+        animation = animate_flight(result, seconds_per_frame=2.0)
+    if arguments.gif:
+        animation.save_gif(arguments.gif)
+        print(f"Animation saved to {arguments.gif}")
+    if arguments.view_3d:
+        plot_flight_3d(result)
+    if arguments.plot or arguments.view_3d:
         plt.show()
 
 

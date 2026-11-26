@@ -15,7 +15,7 @@ Every module is backed by tests and validated against published reference data.
 - [x] **First flight**: linear aerodynamic model, propulsion, 6-DOF equations of motion, RK4 integrator
 - [x] **Equilibrium and analysis**: trim, linearisation, dynamic modes
 - [x] **Control**: PID controllers and an altitude/heading autopilot
-- [ ] **Visualisation**: time-history plots and a 3D view of the flight
+- [x] **Visualisation**: time-history plots and a 3D view of the flight
 
 ## Getting started
 
@@ -65,6 +65,17 @@ the ground track seen from above, or the eigenvalues of the dynamic modes. Plott
 pip install -e ".[plots]"
 python examples/autopilot_flight.py --plot
 ```
+
+## 3D view
+
+```bash
+python examples/autopilot_flight.py --3d
+python examples/autopilot_flight.py --gif flight.gif
+```
+
+Shows the trajectory in 3D with its shadow on the ground and the aircraft drawn at regular intervals with its
+true attitude, then replays the flight as an animation that can also be saved as an animated GIF.
+The aircraft model is enlarged so that it remains visible over a flight of several kilometres.
 
 ## Project layout
 

@@ -1,3 +1,4 @@
+import argparse
 import math
 from pathlib import Path
 
@@ -23,6 +24,10 @@ METRES_PER_SECOND_TO_KNOTS = 1.0 / 0.514444
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Trimmed flight with a short elevator pulse.")
+    parser.add_argument("--plot", action="store_true", help="show the time histories in a window")
+    arguments = parser.parse_args()
+
     aircraft = load_aircraft(AIRCRAFT_FILE)
     trimmed = trim(aircraft, ALTITUDE, AIRSPEED)
     trim_controls = trimmed.controls
@@ -60,6 +65,14 @@ def main() -> None:
     print(f"\nSimulation ended at t = {result.final_time:.1f} s: {result.termination.value}")
     if result.termination_message:
         print(result.termination_message)
+
+    if arguments.plot:
+        import matplotlib.pyplot as plt
+
+        from alula.plotting import plot_flight
+
+        plot_flight(result)
+        plt.show()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import argparse
 import math
 from pathlib import Path
 
@@ -24,6 +25,10 @@ def compass_heading(yaw: float) -> float:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Autopilot climb, turn and speed change.")
+    parser.add_argument("--plot", action="store_true", help="show time histories and ground track")
+    arguments = parser.parse_args()
+
     aircraft = load_aircraft(AIRCRAFT_FILE)
     trimmed = trim(aircraft, START_ALTITUDE, START_AIRSPEED)
     autopilot = Autopilot(TARGETS, trimmed, TIME_STEP)
@@ -55,6 +60,15 @@ def main() -> None:
         )
 
     print(f"\nSimulation ended at t = {result.final_time:.1f} s: {result.termination.value}")
+
+    if arguments.plot:
+        import matplotlib.pyplot as plt
+
+        from alula.plotting import plot_flight, plot_ground_track
+
+        plot_flight(result)
+        plot_ground_track(history)
+        plt.show()
 
 
 if __name__ == "__main__":

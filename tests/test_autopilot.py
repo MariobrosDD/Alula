@@ -113,6 +113,14 @@ def test_coordinated_turn_to_a_new_heading(light_aircraft, trimmed):
     assert history.altitude == pytest.approx(np.full_like(history.altitude, ALTITUDE), abs=3.0)
 
 
+def test_rudder_does_not_chatter_when_entering_a_turn(light_aircraft, trimmed):
+    result, _ = fly(light_aircraft, trimmed, AutopilotTargets(ALTITUDE, math.radians(90.0), AIRSPEED), 5.0)
+    rudder = np.array([controls.rudder for controls in result.controls])
+    direction_changes = np.count_nonzero(np.diff(np.sign(np.diff(rudder))))
+    assert direction_changes <= 4
+    assert np.abs(np.diff(rudder)).sum() < math.radians(60.0)
+
+
 @pytest.mark.parametrize("heading_deg, roll_sign", [(90.0, 1.0), (-90.0, -1.0)])
 def test_banks_towards_the_side_of_the_turn(light_aircraft, trimmed, heading_deg, roll_sign):
     _, history = fly(light_aircraft, trimmed, AutopilotTargets(ALTITUDE, math.radians(heading_deg), AIRSPEED), 5.0)

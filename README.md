@@ -28,6 +28,17 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## Desktop application
+
+```bash
+pip install -e ".[gui]"
+alula-gui
+```
+
+Opens the Alula desktop application, built with Qt (PySide6). It currently shows every parameter of the
+loaded aircraft (geometry, mass and inertia, propulsion and stability derivatives) and can open other
+aircraft files from **File > Open aircraft...**. Trim, dynamic modes and autopilot flights are coming next.
+
 ## First flight
 
 ```bash
@@ -81,6 +92,7 @@ The aircraft model is enlarged so that it remains visible over a flight of sever
 
 ```
 alula/          Simulator source code
+alula/gui/      Desktop application (Qt)
 aircraft/       Aircraft data files (geometry, mass, stability derivatives)
 examples/       Runnable scripts that show the simulator in action
 tests/          Unit tests, one file per module

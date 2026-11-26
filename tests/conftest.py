@@ -1,6 +1,9 @@
+import os
 from pathlib import Path
 
 import pytest
+
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from alula.aircraft import Aircraft, load_aircraft
 

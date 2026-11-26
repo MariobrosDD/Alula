@@ -105,6 +105,24 @@ def normalize_quaternion(quaternion: ArrayLike) -> NDArray[np.float64]:
     return components / norm
 
 
+def euler_angle_rates(
+    roll: float, pitch: float, angular_velocity: ArrayLike
+) -> NDArray[np.float64]:
+    cos_pitch = np.cos(pitch)
+    if abs(cos_pitch) < GIMBAL_LOCK_TOLERANCE:
+        raise ValueError("Euler angle rates are undefined at gimbal lock (pitch of +-90 deg)")
+    p, q, r = np.asarray(angular_velocity, dtype=float)
+    sin_roll, cos_roll = np.sin(roll), np.cos(roll)
+    off_axis_rate = q * sin_roll + r * cos_roll
+    return np.array(
+        [
+            p + off_axis_rate * np.tan(pitch),
+            q * cos_roll - r * sin_roll,
+            off_axis_rate / cos_pitch,
+        ]
+    )
+
+
 def quaternion_derivative(
     quaternion: ArrayLike, angular_velocity: ArrayLike
 ) -> NDArray[np.float64]:

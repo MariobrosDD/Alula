@@ -80,8 +80,8 @@ def initial_state(
     heading: float = 0.0,
     flight_path_angle: float = 0.0,
 ) -> State:
-    if altitude <= 0.0:
-        raise ValueError(f"Initial altitude must be above the ground, got {altitude} m")
+    if altitude < 0.0:
+        raise ValueError(f"Initial altitude cannot be below sea level, got {altitude} m")
     if airspeed <= 0.0:
         raise ValueError(f"Initial airspeed must be positive, got {airspeed} m/s")
     return State(
